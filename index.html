@@ -3,159 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soft Life Investments - Login/Register</title>
+    <title>Soft Life Investments</title>
     <style>
-        /* General Styles */
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+            background-image: url('background.jpg'); /* Replace with your background image */
+            background-size: cover;
+            background-position: center;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-image: url('https://img.wapka.io/00emab.jpg'); /* Background image */
-            background-size: cover;
-            background-position: center;
+            margin: 0;
+            color: #fff;
         }
-
-        /* Authentication Container */
-        .auth-container {
-            background: rgba(255, 255, 255, 0.9);
+        .container {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 8px;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
-
-        /* Logo */
-        .logo-container {
-            text-align: center;
-            margin-bottom: 20px;
+        .container img {
+            width: 80px; /* Adjust size of the logo */
+            border-radius: 50%;
         }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%; /* Make the logo round */
+        .container h2 {
+            margin: 0 0 20px;
         }
-
-        /* Form Container */
-        .form-container h2 {
-            margin-bottom: 20px;
-        }
-
-        .form-container input {
+        .container input {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .form-container button {
-            width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
             border: none;
             border-radius: 5px;
+        }
+        .container button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: #fff;
+            font-size: 16px;
             cursor: pointer;
         }
-
-        .form-container button:hover {
-            background-color: #45a049;
+        .container button:hover {
+            background-color: #218838;
         }
-
-        .form-container p {
+        .link {
             margin-top: 10px;
         }
-
-        .form-container a {
-            color: #007BFF;
+        .link a {
+            color: #007bff;
             text-decoration: none;
         }
-
-        .form-container a:hover {
+        .link a:hover {
             text-decoration: underline;
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="auth-container">
-        <!-- Logo -->
-        <div class="logo-container">
-            <img src="https://img.wapka.io/00emab.jpg" alt="Soft Life Investments" class="logo">
-        </div>
-
-        <!-- Login Form -->
-        <div id="login-form" class="form-container">
+    <div class="container" id="auth-container">
+        <img src="logo.png" alt="Logo"> <!-- Replace with your logo -->
+        <div id="login-form">
             <h2>Login</h2>
-            <form onsubmit="loginUser(event)">
-                <input type="text" id="login-phone" placeholder="Phone Number" required>
-                <input type="password" id="login-password" placeholder="Password" required>
-                <button type="submit">Login</button>
-            </form>
-            <p>Don't have an account? <a href="#" onclick="showRegistration()">Register</a></p>
+            <input type="email" id="login-email" placeholder="Email" required>
+            <input type="password" id="login-password" placeholder="Password" required>
+            <button onclick="login()">Login</button>
+            <div class="link">
+                <a href="#" onclick="showRegisterForm(event)">Don't have an account? Register</a>
+            </div>
         </div>
-
-        <!-- Registration Form -->
-        <div id="registration-form" class="form-container" style="display: none;">
+        <div id="register-form" class="hidden">
             <h2>Register</h2>
-            <form onsubmit="registerUser(event)">
-                <input type="text" id="reg-fullname" placeholder="Full Name" required>
-                <input type="text" id="reg-phone" placeholder="Phone Number" required>
-                <input type="password" id="reg-password" placeholder="Password" required>
-                <button type="submit">Register</button>
-            </form>
-            <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+            <input type="text" id="full-name" placeholder="Full Name" required>
+            <input type="email" id="register-email" placeholder="Email" required>
+            <input type="password" id="register-password" placeholder="Password" required>
+            <button onclick="register()">Register</button>
+            <div class="link">
+                <a href="#" onclick="showLoginForm(event)">Already have an account? Login</a>
+            </div>
         </div>
     </div>
 
-    <script>
-        // Function to show the registration form
-        function showRegistration() {
-            document.getElementById('login-form').style.display = 'none';
-            document.getElementById('registration-form').style.display = 'block';
-        }
+    <!-- Include Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
-        // Function to show the login form
-        function showLogin() {
-            document.getElementById('registration-form').style.display = 'none';
-            document.getElementById('login-form').style.display = 'block';
-        }
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-ImYLnWYlm6jSEkKtPGD9C67Z6kOS3YY",
+            authDomain: "login-b1f86.firebaseapp.com",
+            projectId: "login-b1f86",
+            storageBucket: "login-b1f86.appspot.com",
+            messagingSenderId: "747113272678",
+            appId: "1:747113272678:web:505032dcf98b2acee064a7",
+            measurementId: "G-6FXW88WCM2"
+        };
 
-        // Function to handle login
-        function loginUser(event) {
-            event.preventDefault();
-            
-            // Fetching user input
-            const phone = document.getElementById('login-phone').value;
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        function login() {
+            const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-            
-            // Simple validation or fetch data from server
-            // Here, you would typically make a request to your server to validate the login
-            
-            // Redirect to the home page if login is successful
-            window.location.href = 'home.html';
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Successfully logged in
+                    window.location.href = 'home.html';
+                })
+                .catch((error) => {
+                    alert('Invalid email or password.');
+                });
         }
 
-        // Function to handle registration
-        function registerUser(event) {
-            event.preventDefault();
-            
-            // Fetching user input
-            const fullName = document.getElementById('reg-fullname').value;
-            const phone = document.getElementById('reg-phone').value;
-            const password = document.getElementById('reg-password').value;
-            
-            // Save user data to a server or localStorage
-            // This is where you'd make a request to your server to register the user
+        function register() {
+            const fullName = document.getElementById('full-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
 
-            // Redirect to the home page after registration
-            window.location.href = 'home.html';
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Successfully registered
+                    // Optionally, save the full name in your database
+                    window.location.href = 'home.html';
+                })
+                .catch((error) => {
+                    alert('Error registering. Please try again.');
+                });
+        }
+
+        function showRegisterForm(event) {
+            event.preventDefault();
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
+        }
+
+        function showLoginForm(event) {
+            event.preventDefault();
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
         }
     </script>
 </body>
-</html>
+</html></html>
